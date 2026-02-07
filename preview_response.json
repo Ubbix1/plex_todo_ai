@@ -1,0 +1,10 @@
+{
+  "thought_process": "The user is expressing feelings of being 'down' and anxiety about an upcoming 'cybersecurity exam'. They requested help with studying and setting a todo. This requires an empathetic response ('emotional_support') and a structured approach to studying ('advice') in addition to creating the core task.",
+  "title": "Prepare for Cybersecurity Exam",
+  "time": "09:00",
+  "date": "tomorrow",
+  "repeat": "daily",
+  "priority": "high",
+  "emotional_support": "I hear you. It's completely normal to feel overwhelmed before a big exam, especially when you're feeling down. Be kind to yourself—you've got this.",
+  "advice": "Since you have a week, breaking it down is key. 1. Start with a 10-minute review of your strongest topic to build confidence. 2. Use the Pomodoro technique (25m study, 5m break). 3. Focus on one module per day. I've set a daily reminder for you to start at 9 AM."
+}

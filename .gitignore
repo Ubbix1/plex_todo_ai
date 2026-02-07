@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables
+.env
+.env.local
+
+# IDEs
+.idea/
+.vscode/
+
+# Testing
+.pytest_cache/
