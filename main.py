@@ -44,9 +44,13 @@ async def query_hf_api(payload):
         response = await client.post(HF_API_URL, headers=headers, json=payload, timeout=30.0)
         return response.json()
 
+from fastapi.responses import FileResponse, RedirectResponse
+
+# ... (other imports)
+
 @app.get("/", include_in_schema=False)
 async def root():
-    return RedirectResponse(url="/docs")
+    return FileResponse("index.html")
 
 @app.get("/health")
 async def health_check():

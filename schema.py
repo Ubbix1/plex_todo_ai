@@ -7,6 +7,8 @@ class TodoTask(BaseModel):
     date: Optional[str] = None
     repeat: Optional[str] = None
     priority: Optional[str] = "medium"
+    subtasks: list[str] = []
+    estimated_duration: Optional[str] = None
     advice: Optional[str] = None
     emotional_support: Optional[str] = None
     thought_process: Optional[str] = None

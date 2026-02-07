@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plex ToDo AI - Tester</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --surface-color: #1e1e1e;
+            --primary-color: #bb86fc;
+            --text-color: #e0e0e0;
+            --secondary-text: #a0a0a0;
+            --border-color: #333;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .card {
+            background-color: var(--surface-color);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            background-color: #2c2c2c;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 16px;
+            resize: vertical;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        textarea:focus {
+            outline: 2px solid var(--primary-color);
+            border-color: transparent;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            margin-top: 10px;
+            float: right;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        pre {
+            background-color: #000;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            color: #0f0;
+            font-size: 14px;
+            margin-top: 0;
+            white-space: pre-wrap;       /* css-3 */
+            white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+            white-space: -pre-wrap;      /* Opera 4-6 */
+            white-space: -o-pre-wrap;    /* Opera 7 */
+            word-wrap: break-word;       /* Internet Explorer 5.5+ */
+        }
+
+        .label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--secondary-text);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .history-item {
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 0;
+            cursor: pointer;
+        }
+
+        .history-item:hover {
+            background-color: #252525;
+        }
+        
+        .history-text {
+            font-size: 14px;
+            color: var(--text-color);
+        }
+
+        .history-meta {
+            font-size: 12px;
+            color: var(--secondary-text);
+        }
+
+        #loading {
+            display: none;
+            color: var(--primary-color);
+            margin-top: 10px;
+        }
+        
+        .subtasks-list {
+            list-style-type: disc;
+            padding-left: 20px;
+            color: #ccc;
+        }
+
+        .field-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        
+        .highlight {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Plex ToDo AI ✨</h1>
+        <p style="color: #888">Natural Language Task Parser</p>
+    </header>
+
+    <div class="card">
+        <label class="label">Input</label>
+        <textarea id="inputText" placeholder="e.g., Plan my birthday party properly including checking budget and inviting friends"></textarea>
+        <div style="overflow: hidden;">
+            <span id="loading">Thinking... 🧠</span>
+            <button onclick="parseTask()" id="parseBtn">Parse Task</button>
+        </div>
+    </div>
+
+    <div class="card" id="resultCard" style="display: none;">
+        <label class="label">Structured Output</label>
+        
+        <div id="formattedView">
+            <!-- Dynamic Content -->
+        </div>
+
+        <details style="margin-top: 20px;">
+            <summary style="cursor: pointer; color: var(--secondary-text);">View Raw JSON</summary>
+            <pre id="jsonOutput"></pre>
+        </details>
+    </div>
+
+    <div class="card">
+        <label class="label">History</label>
+        <div id="historyList"></div>
+    </div>
+</div>
+
+<script>
+    const API_URL = "/parse-task";
+
+    async function parseTask() {
+        const input = document.getElementById('inputText').value;
+        if (!input.trim()) return;
+
+        const btn = document.getElementById('parseBtn');
+        const loading = document.getElementById('loading');
+        
+        btn.disabled = true;
+        loading.style.display = 'inline-block';
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: input })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            displayResult(data);
+            saveToHistory(input, data);
+        } catch (error) {
+            alert('Error: ' + error.message);
+        } finally {
+            btn.disabled = false;
+            loading.style.display = 'none';
+        }
+    }
+
+    function displayResult(data) {
+        document.getElementById('resultCard').style.display = 'block';
+        document.getElementById('jsonOutput').textContent = JSON.stringify(data, null, 2);
+
+        let subtasksHtml = '';
+        if (data.subtasks && data.subtasks.length > 0) {
+            subtasksHtml = `
+                <div style="margin-top: 10px;">
+                    <span class="label">Subtasks</span>
+                    <ul class="subtasks-list">
+                        ${data.subtasks.map(task => `<li>${task}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        const html = `
+            <h2 style="margin-top: 0; color: var(--primary-color);">${data.title}</h2>
+            
+             <div class="field-row">
+                <span>📅 Date: <span class="highlight">${data.date || 'N/A'}</span></span>
+                <span>⏰ Time: <span class="highlight">${data.time || 'N/A'}</span></span>
+            </div>
+            
+             <div class="field-row">
+                <span>⚡ Priority: <span class="highlight">${data.priority}</span></span>
+                <span>⌛ Duration: <span class="highlight">${data.estimated_duration || 'Unknown'}</span></span>
+            </div>
+
+            ${subtasksHtml}
+
+            ${data.emotional_support ? `
+            <div style="margin-top: 15px; padding: 10px; background: rgba(187, 134, 252, 0.1); border-radius: 6px; border-left: 3px solid var(--primary-color);">
+                <strong>💖 Support:</strong> ${data.emotional_support}
+            </div>` : ''}
+
+             ${data.advice ? `
+            <div style="margin-top: 10px; font-size: 0.9em; color: #ccc;">
+                <strong>💡 Advice:</strong> ${data.advice}
+            </div>` : ''}
+            
+            <div style="margin-top: 15px; font-size: 0.8em; color: #666; font-style: italic;">
+               🤖 Thought Process: ${data.thought_process}
+            </div>
+        `;
+
+        document.getElementById('formattedView').innerHTML = html;
+    }
+
+    function saveToHistory(text, data) {
+        const history = JSON.parse(localStorage.getItem('plex_todo_history') || '[]');
+        history.unshift({ text, result: data, timestamp: new Date().toISOString() });
+        if (history.length > 5) history.pop();
+        localStorage.setItem('plex_todo_history', JSON.stringify(history));
+        renderHistory();
+    }
+
+    function renderHistory() {
+        const list = document.getElementById('historyList');
+        const history = JSON.parse(localStorage.getItem('plex_todo_history') || '[]');
+        
+        list.innerHTML = history.map((item, index) => `
+            <div class="history-item" onclick="loadHistoryItem(${index})">
+                <div class="history-text">${item.text}</div>
+                <div class="history-meta">${new Date(item.timestamp).toLocaleTimeString()}</div>
+            </div>
+        `).join('') || '<div style="color: #666; font-style: italic;">No history yet</div>';
+    }
+
+    function loadHistoryItem(index) {
+        const history = JSON.parse(localStorage.getItem('plex_todo_history') || '[]');
+        const item = history[index];
+        if (item) {
+            document.getElementById('inputText').value = item.text;
+            displayResult(item.result);
+        }
+    }
+
+    // Load history on start
+    renderHistory();
+</script>
+
+</body>
+</html>
