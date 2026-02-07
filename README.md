@@ -43,14 +43,21 @@ The server will start at `http://127.0.0.1:8000`.
 
 **POST** `/parse-task`
 
-Input:
+#### Live Example
+```bash
+curl -X POST "https://plex-todo-ai.onrender.com/parse-task" \
+     -H "Content-Type: application/json" \
+     -d '{"text": "Call John every Friday at 10am"}'
+```
+
+#### Request Format
 ```json
 {
   "text": "Call John every Friday at 10am"
 }
 ```
 
-Output:
+#### Response Format
 ```json
 {
   "title": "Call John",
