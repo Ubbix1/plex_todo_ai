@@ -40,7 +40,7 @@ def detect_mode(text: str) -> str:
     t = text.lower()
 
     # Task keywords (adding, scheduling)
-    if any(k in t for k in ["add", "remind", "schedule", "buy", "submit", "finish", "call", "appointment"]):
+    if any(k in t for k in ["add", "remind", "schedule", "buy", "submit", "finish", "call", "appointment", "study", "learn", "read", "write", "practice", "fix", "debug", "create", "make", "do"]):
         return "TASK"
 
     # Planner keywords (organizing, optimizing)
