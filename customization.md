@@ -14,14 +14,14 @@ Open `prompt.py` and modify `SYSTEM_PROMPT`.
 The default model is `TinyLlama/TinyLlama-1.1B-Chat-v1.0`. It is small and fast but may lack reasoning capabilities for complex tasks.
 
 ### Steps to Switch
-1.  Find a model on [Hugging Face](https://huggingface.co/models) (e.g., `microsoft/phi-2`, `google/gemma-2b`).
+1.  Find a model on [Hugging Face](https://huggingface.co/models) (e.g., `microsoft/phi-2`, `meta-llama/Llama-3.3-70B-Instruct`).
 2.  Open `main.py`.
 3.  Update the `model` argument in the `pipeline` function:
 
 ```python
 generator = pipeline(
     "text-generation",
-    model="google/gemma-2b",  # Change this string
+    model="meta-llama/Llama-3.3-70B-Instruct:together",  # Change this string
     device_map="auto"
 )
 ```

@@ -17,7 +17,11 @@ def test_health_check():
 @patch("main.query_hf_api", new_callable=AsyncMock)
 def test_parse_task_success(mock_query):
     # Mock the API response
-    mock_query.return_value = [{"generated_text": 'Some text... {"title": "Buy milk", "time": "17:00", "priority": "medium"} ...'}]
+    mock_query.return_value = {
+        "choices": [
+            {"message": {"content": '{"title": "Buy milk", "time": "17:00", "priority": "medium"}'}}
+        ]
+    }
     
     response = client.post("/parse-task", json={"text": "Buy milk at 5pm"})
     assert response.status_code == 200
