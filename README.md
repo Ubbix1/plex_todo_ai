@@ -3,6 +3,7 @@
 Current Version: 1.2.0 (Render Deployment)
 - **Live Demo:** [https://plex-todo-ai.onrender.com/docs](https://plex-todo-ai.onrender.com/docs)
 - **GitHub Repository:** [https://github.com/Ubbix1/plex_todo_ai](https://github.com/Ubbix1/plex_todo_ai)
+- **Download Android App:** [plex_todo.apk](Apk/plex_todo.apk)
 
 A robust, offline-capable AI backend for the **Plex ToDo** application. This service parses natural language into structured To-Do tasks using the **Hugging Face Inference API**, making it lightweight and deployable on free-tier platforms like Render and PythonAnywhere.
 
